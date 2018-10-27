@@ -34,16 +34,22 @@ header img {
   max-height: 70vh;
 }
 
+.info {
+  padding: 1em 20em;
+}
+@media only screen and (max-width: 800px)  {
+  .info {
+    padding: 1em 4em;
+  }
+}
 .wut {
   text-align: left;
-  padding: 1em 5em;
   background-color: #229922;
   color: white;
 }
 
 .when {
   text-align: right;
-  padding: 1em 5em;
   background-color: #3b6398;
   color: white;
 }

@@ -33,7 +33,7 @@ type NonTerminatingStepEnum = YUP
 type Step = NonTerminatingStepEnum StepManifest
 
 ready id = NonTerminatingStepEnum (StepManifest "orange" "ready to roll?" READY YUP NOPE False id)
-yup id = NonTerminatingStepEnum (StepManifest "pink" "yee-ha! let's ride!" YUP READY READY True id)
+yup id = NonTerminatingStepEnum (StepManifest "pink" "yee-ha! let's ride!" YUP YUP YUP True id)
 hate_bikes id = NonTerminatingStepEnum (StepManifest "green" "what, do you hate bikes?" WHAT_DO_YOU_HATE_BIKES YUP YUP False id)
 nope id = NonTerminatingStepEnum (StepManifest "purple" "no can do" NOPE WHAT_DO_YOU_HATE_BIKES YUP False id)
 
@@ -52,17 +52,25 @@ steps = Array.fromList (
     (step_templates)
   )
 
-matchStepOnFrom: NonTerminatingStepEnum -> Step -> Bool
+manifests = Array.map
+  (
+    \stp -> case stp of
+    NonTerminatingStepEnum manifest -> manifest
+  )
+  steps
+
+matchStepOnFrom: NonTerminatingStepEnum -> StepManifest -> Bool
 matchStepOnFrom stepType s = stepType == s.from
 
-getManifest:  NonTerminatingStepEnum -> StepManifest
-getManifest stepType =
+getManifest:  NonTerminatingStepEnum -> Array StepManifest -> StepManifest
+getManifest stepType mfs =
   let
     isMatch = matchStepOnFrom stepType
-    match = (Array.get 0 (Array.filter isMatch steps))
+    match = (Array.get 0 (Array.filter isMatch mfs))
   in
     case match of
       Just manifest -> manifest
+      _ -> StepManifest "" "" READY READY READY False "-1"
 
 type alias Model =
     {
@@ -84,7 +92,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     NoOp -> ( model, Cmd.none )
-    ScrollToPane stepType -> (model, scrollIdIntoView (getManifest stepType))
+    ScrollToPane stepType -> (model, scrollIdIntoView (getManifest stepType manifests).id)
 
 
 ifNotFinal: Bool -> List (Html Msg) -> List (Html Msg)
@@ -116,16 +124,16 @@ view model =
           , h1 [] [ text "Up n' Up™" ]
           , h4 [] [ text "let's go biking!"]
         ],
-        div [ class "wut" ] [
+        div [ class "wut info" ] [
           h1 [] [ text "what is it." ],
           p [] [ text "you. me. us.  biking!" ],
           p [] [ text "let's ride bikes at lunch." ]
         ],
-        div [ class "when" ] [
+        div [ class "when info" ] [
           h1 [] [ text "when is it." ],
           p [] [ text "wednesdays! noon. fair weather only." ]
         ],
-        div [ class "where" ] [
+        div [ class "where info" ] [
           h1 [] [ text "where is it." ],
           p [] [
             text "up a tiny little hill.",
