@@ -1,0 +1,191 @@
+[
+  {
+    "key": "READY",
+    "body": "ready to ride?",
+    "options": [
+      {
+        "body": "i'm in!",
+        "to": "IN"
+      },
+      {
+        "body": "no. i'm not interested.",
+        "to": "WAT_HATE_BIKES"
+      }
+    ]
+  },
+  {
+    "key": "WAT_HATE_BIKES",
+    "body": "what--do you hate bikes?",
+    "options": [
+      {
+        "body": "ya.  i hate 'em real bad",
+        "to": "YOU_DONT_HATE_BIKES"
+      },
+      {
+        "body": "no.",
+        "to": "WAS_IT_SOMETHING_I_SAID"
+      }
+    ]
+  },
+  {
+    "key": "YOU_DONT_HATE_BIKES",
+    "body": "you don't actually hate bikes.",
+    "options": [
+      {
+        "body": "no i hate 'em alright.",
+        "to": "TRUST_ME_YOU_DONT_HATE_BIKES"
+      }
+    ]
+  },
+  {
+    "key": "TRUST_ME_YOU_DONT_HATE_BIKES",
+    "body": "trust me.  you don't hate 'em. i'll show you.",
+    "options": [
+      {
+        "body": "no, you won't show me.",
+        "to": "WAS_IT_SOMETHING_I_SAID"
+      },
+      {
+        "body": "you think you can convince me?",
+        "to": "TALK_TO_ME"
+      }
+    ]
+  },
+  {
+    "key": "WAS_IT_SOMETHING_I_SAID",
+    "body": "was it something i said?",
+    "options": [
+      {
+        "body": "ya.",
+        "to": "BUMMER_SUPPORT"
+      },
+      {
+        "body": "na.",
+        "to": "NO_REASON_NOT_TO"
+      }
+    ]
+  },
+  {
+    "key": "NO_REASON_NOT_TO",
+    "body": "obviously i'm pretty nice.  so you have no reason not to bike?",
+    "options": [
+      {
+        "body": "i guess i shoud ride then!",
+        "to": "IN"
+      },
+      {
+        "body": "i'm just not sure yet.",
+        "to": "FIT_ENOUGH"
+      }
+    ]
+  },
+  {
+    "key": "FIT_ENOUGH",
+    "body": "you're fit enough.  you're good looking enough.  you're capable enough, i promise!",
+    "options": [
+      {
+        "body": "still, could be hard.",
+        "to": "ITS_A_BIG_HILL"
+      },
+      {
+        "body": "you don't know me! you don't know anything!",
+        "to": "I_KNOW_UR_READY"
+      }
+    ]
+  },
+  {
+    "key": "I_KNOW_UR_READY",
+    "body": "ohhhh i know you alright. you're ready?",
+    "options": [
+      {
+        "body": "seriously, looks hard.",
+        "to": "ITS_A_BIG_HILL"
+      },
+      {
+        "body": "well i am interested in fun and fitness.",
+        "to": "PEP_TALK"
+      }
+    ]
+  },
+  {
+    "key": "ITS_A_BIG_HILL",
+    "body": "it's a big hill. fitness is by definition challenging.  i'll make it fun!",
+    "options": [
+      {
+        "body": "alright.  but i have questions.",
+        "to": "TALK_TO_ME"
+      },
+      {
+        "body": "still not sure.",
+        "to": "PEP_TALK"
+      }
+    ]
+  },
+  {
+    "key": "PEP_TALK",
+    "body": "do you need any hot tips or pep talk?",
+    "options": [
+      {
+        "body": "nah, dawg.",
+        "to": "TALK_TO_ME"
+      },
+      {
+        "body": "maybe?",
+        "to": "WE_CAN"
+      }
+    ]
+  },
+  {
+    "key": "WE_CAN",
+    "body": "we can go slow.  we can go fast.  we can figure it out.",
+    "options": [
+      {
+        "body": "rad.",
+        "to": "IN"
+      },
+      {
+        "body": "i just don't know if biking uphill is for me",
+        "to": "ITS_A_BIG_HILL"
+      }
+    ]
+  },
+  {
+    "key": "TALK_TO_ME",
+    "body": "just come talk to me!",
+    "options": [
+      {
+        "body": "i'm convinced.",
+        "to": "IN"
+      },
+      {
+        "body": "you're a little weird",
+        "to": "OBVIOUSLY"
+      }
+    ]
+  },
+  {
+    "key": "OBVIOUSLY",
+    "body": "ya, obviously.",
+    "options": [
+      {
+        "body": "soooooo...",
+        "to": "TALK_TO_ME"
+      }
+    ]
+  },
+  {
+    "key": "IN",
+    "body": "nice! let's ride!",
+    "options": [
+      {
+        "body": "what's next?",
+        "to": "GET_IN_TOUCH"
+      }
+    ]
+  },
+  {
+    "key": "GET_IN_TOUCH",
+    "body": "ping me on slack.",
+    "options": []
+  }
+]

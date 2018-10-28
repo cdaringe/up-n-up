@@ -1,4 +1,4 @@
-port module Main exposing (Model, Msg(..), NonTerminatingStepEnum(..), Step(..), StepManifest, getManifest, hate_bikes, ifNotFinal, init, main, manifests, matchStepOnFrom, nope, ready, scrollIdIntoView, step, step_templates, steps, toStep, update, view, yup)
+port module Main exposing (Model, Msg(..), getManifest, ifNotFinal, init, main, manifests, matchStepOnFrom, scrollIdIntoView, toStep, update, view)
 
 import Array exposing (..)
 import Browser
@@ -6,88 +6,29 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import List exposing (..)
+import Step exposing (..)
+import JSON exposing (..)
 
 
 port scrollIdIntoView : String -> Cmd msg
-
-
-type alias StepManifest =
-    { bg : String
-    , text : String
-    , from : NonTerminatingStepEnum
-    , yes : NonTerminatingStepEnum
-    , no : NonTerminatingStepEnum
-    , isFinal : Bool
-    , id : String
-    }
-
-
-type NonTerminatingStepEnum
-    = YUP
-    | READY
-    | NOPE
-    | WHAT_DO_YOU_HATE_BIKES
-    | YEP_I_HATE_BIKES
-    | YOU_DONT_HATE_BIKES_ILL_SHOW_YOUfest
-    | NO_YOU_WONT_SHOW_ME
-    | NO_I_DONT_HATE_BIKES
-    | I_DONT_HAVE_A_GREAT_BIKE
-
-
-type Step
-    = NonTerminatingStepEnum StepManifest
-
-
-ready id =
-    NonTerminatingStepEnum (StepManifest "orange" "ready to roll?" READY YUP NOPE False id)
-
-
-yup id =
-    NonTerminatingStepEnum (StepManifest "pink" "yee-ha! let's ride!" YUP YUP YUP True id)
-
-
-hate_bikes id =
-    NonTerminatingStepEnum (StepManifest "green" "what, do you hate bikes?" WHAT_DO_YOU_HATE_BIKES YUP YUP False id)
-
-
-nope id =
-    NonTerminatingStepEnum (StepManifest "purple" "no can do" NOPE WHAT_DO_YOU_HATE_BIKES YUP False id)
-
-
-step_templates =
-    [ ready
-    , hate_bikes
-    , nope
-    , yup
-    ]
-
-
-steps : Array Step
-steps =
-    Array.fromList
-        (map2
-            (\id stepMaker -> stepMaker id)
-            (List.map String.fromInt (range 1 (List.length step_templates)))
-            step_templates
-        )
 
 
 manifests =
     Array.map
         (\stp ->
             case stp of
-                NonTerminatingStepEnum manifest ->
+                StepType manifest ->
                     manifest
         )
-        steps
+        (Array.fromList [])
 
 
-matchStepOnFrom : NonTerminatingStepEnum -> StepManifest -> Bool
+matchStepOnFrom : StepType -> StepManifest -> Bool
 matchStepOnFrom stepType s =
     stepType == s.from
 
 
-getManifest : NonTerminatingStepEnum -> Array StepManifest -> StepManifest
+getManifest : StepType -> Array StepManifest -> StepManifest
 getManifest stepType mfs =
     let
         isMatch =
@@ -109,15 +50,20 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
+type alias Flags =
+    { steps : List BaseStep
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     ( { step =
-            case Array.get 0 steps of
+            case Array.get 0 Array.empty of
                 Just i ->
                     i
 
                 Nothing ->
-                    ready "-1"
+                    ready
       }
     , Cmd.none
     )
@@ -125,7 +71,7 @@ init =
 
 type Msg
     = NoOp
-    | ScrollToPane NonTerminatingStepEnum
+    | ScrollToPane StepType
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -163,7 +109,7 @@ toStep manifest =
 step : Step -> Html Msg
 step stp =
     case stp of
-        NonTerminatingStepEnum manifest ->
+        StepType manifest ->
             toStep manifest
 
 
@@ -197,15 +143,15 @@ view model =
                     ]
                 ]
             ]
-            (List.map step (Array.toList steps))
+            (List.map step [])
         )
 
 
-main : Program () Model Msg
+main : Program JSON Model Msg
 main =
     Browser.element
         { view = view
-        , init = \_ -> init
+        , init = \flags -> init flags
         , update = update
         , subscriptions = always Sub.none
         }
