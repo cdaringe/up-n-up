@@ -1,24 +1,13 @@
-module Step exposing (BaseStep, Step(..), StepLink, StepManifest, StepType(..), ready)
+module Step exposing (BaseStep, Step, StepLink, ready)
 
 import Array exposing (..)
+import Json.Decode as Decode
 import List exposing (..)
-
-
-type StepType
-    = YUP
-    | READY
-    | NOPE
-    | WHAT_DO_YOU_HATE_BIKES
-    | YEP_I_HATE_BIKES
-    | YOU_DONT_HATE_BIKES_ILL_SHOW_YOUfest
-    | NO_YOU_WONT_SHOW_ME
-    | NO_I_DONT_HATE_BIKES
-    | I_DONT_HAVE_A_GREAT_BIKE
 
 
 type alias StepLink =
     { body : String
-    , to : StepType
+    , to : String
     }
 
 
@@ -29,31 +18,15 @@ type alias BaseStep =
     }
 
 
-type alias StepManifest =
-    { bg : String
+type alias Step =
+    { bg_color : String
     , text : String
-    , from : StepType
-    , yes : StepType
-    , no : StepType
-    , isFinal : Bool
+    , text_color : String
+    , from : String
     , id : String
+    , options : List StepLink
     }
 
 
-type Step
-    = StepType StepManifest
-
-
-
--- steps : Array Step
--- steps =
---     Array.fromList
---         (map2
---             (\id stepMaker -> stepMaker id)
---             (List.map String.fromInt (range 1 (List.length step_templates)))
---             step_templates
---         )
-
-
 ready =
-    StepType (StepManifest "orange" "ready to roll?" READY YUP NOPE False "-1")
+    Step "orange" "ready to roll?" "" "" "" []

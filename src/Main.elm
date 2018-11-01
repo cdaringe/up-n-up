@@ -1,38 +1,29 @@
-port module Main exposing (Model, Msg(..), getManifest, ifNotFinal, init, main, manifests, matchStepOnFrom, scrollIdIntoView, toStep, update, view)
+port module Main exposing (Flags, Model, Msg(..), getManifest, ifNotFinal, init, main, matchStepOnFrom, scrollIdIntoView, toStep, update, view)
 
 import Array exposing (..)
 import Browser
+import Colors exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Json.Decode exposing (decodeValue)
 import List exposing (..)
 import Step exposing (..)
-import JSON exposing (..)
 
 
 port scrollIdIntoView : String -> Cmd msg
 
 
-manifests =
-    Array.map
-        (\stp ->
-            case stp of
-                StepType manifest ->
-                    manifest
-        )
-        (Array.fromList [])
+matchStepOnFrom : String -> Step -> Bool
+matchStepOnFrom target s =
+    target == s.from
 
 
-matchStepOnFrom : StepType -> StepManifest -> Bool
-matchStepOnFrom stepType s =
-    stepType == s.from
-
-
-getManifest : StepType -> Array StepManifest -> StepManifest
-getManifest stepType mfs =
+getManifest : String -> Array Step -> Step
+getManifest target mfs =
     let
         isMatch =
-            matchStepOnFrom stepType
+            matchStepOnFrom target
 
         match =
             Array.get 0 (Array.filter isMatch mfs)
@@ -42,28 +33,40 @@ getManifest stepType mfs =
             manifest
 
         _ ->
-            StepManifest "" "" READY READY READY False "-1"
+            ready
 
 
 type alias Model =
     { step : Step
+    , steps : Array Step
     }
 
 
 type alias Flags =
-    { steps : List BaseStep
+    { steps : Array BaseStep
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
+    let
+        step_count =
+            Array.length flags.steps
+
+        steps_with_id =
+            List (range 1 step_count) flags.steps
+
+        steps =
+            \[ id, step ] -> Step (Colors.select_bg_color step_count id) step.body (Array.get (modBy step_count id) color_combos).text step.key (String.fromInt id) step.options
+    in
     ( { step =
-            case Array.get 0 Array.empty of
+            case Array.get 0 flags.steps of
                 Just i ->
                     i
 
                 Nothing ->
                     ready
+      , steps = flags.steps
       }
     , Cmd.none
     )
@@ -71,7 +74,7 @@ init flags =
 
 type Msg
     = NoOp
-    | ScrollToPane StepType
+    | ScrollToPane String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -80,8 +83,8 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        ScrollToPane stepType ->
-            ( model, scrollIdIntoView (getManifest stepType manifests).id )
+        ScrollToPane target ->
+            ( model, scrollIdIntoView (getManifest target model.steps).id )
 
 
 ifNotFinal : Bool -> List (Html Msg) -> List (Html Msg)
@@ -93,7 +96,7 @@ ifNotFinal isFinal content =
         content
 
 
-toStep : StepManifest -> Html Msg
+toStep : Step -> Html Msg
 toStep manifest =
     let
         { text, bg, isFinal, id, yes, no } =
@@ -104,13 +107,6 @@ toStep manifest =
         , div [ class "yup" ] (ifNotFinal isFinal [ button [ onClick (ScrollToPane yes) ] [ Html.text "yup" ] ])
         , div [ class "nope" ] (ifNotFinal isFinal [ button [ onClick (ScrollToPane no) ] [ Html.text "nope" ] ])
         ]
-
-
-step : Step -> Html Msg
-step stp =
-    case stp of
-        StepType manifest ->
-            toStep manifest
 
 
 view : Model -> Html Msg
@@ -143,11 +139,13 @@ view model =
                     ]
                 ]
             ]
-            (List.map step [])
+            (Array.toList
+                (Array.map toStep model.steps)
+            )
         )
 
 
-main : Program JSON Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { view = view
