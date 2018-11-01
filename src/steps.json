@@ -66,6 +66,20 @@
     ]
   },
   {
+    "key": "BUMMER_SUPPORT",
+    "body": "bummer. i want to support you. i think you're really great.",
+    "options": [
+      {
+        "body": "i'm not convinced.",
+        "to": "FIT_ENOUGH"
+      },
+      {
+        "body": "well in that case...",
+        "to": "IN"
+      }
+    ]
+  },
+  {
     "key": "NO_REASON_NOT_TO",
     "body": "obviously i'm pretty nice.  so you have no reason not to bike?",
     "options": [

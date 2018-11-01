@@ -70,6 +70,24 @@ header img {
 .nope {
   padding: 1em 5em 1em 0;
 }
-.stepper {
-  min-height: 350px;
+.stepper__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1em;
+}
+
+.stepper__content {
+  margin: 0;
+}
+
+.stepper__content h1 {
+  margin: 0 0 20px 0;
+}
+
+.stepper__content button {
+  margin: 4px;
+  width: 30vw;
+  height: 40px;
 }
