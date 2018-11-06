@@ -1,0 +1,8 @@
+{
+  "emeraldwalk.runonsave": {
+    "match": ".elm$",
+    "commands": [
+      "npx elm-format {file}"
+    ]
+  }
+}

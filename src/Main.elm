@@ -1,6 +1,7 @@
 port module Main exposing (Flags, Model, Msg(..), getManifest, ifNotFinal, init, main, matchStepOnFrom, renderStep, scrollIdIntoView, update, view)
 
 import Array exposing (..)
+import BannerImage exposing (..)
 import Browser
 import Colors exposing (..)
 import Html exposing (..)
@@ -8,7 +9,10 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Decode exposing (decodeValue)
 import List exposing (..)
+import Process
+import RollingList exposing (..)
 import Step exposing (..)
+import Task
 import Tuple exposing (pair)
 
 
@@ -38,7 +42,8 @@ getManifest target mfs =
 
 
 type alias Model =
-    { step : Step
+    { banner_images : RollingList BannerImage
+    , step : Step
     , steps : Array Step
     }
 
@@ -48,14 +53,23 @@ type alias Flags =
     }
 
 
+delay : Int -> msg -> Cmd msg
+delay time msg =
+    Process.sleep (toFloat time)
+        |> Task.perform (\_ -> msg)
+
+
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
+        banner_image =
+            current_image images
+
         step_count =
             Array.length flags.steps
 
         steps_with_id =
-            map2 pair (range 1 step_count) (toList flags.steps)
+            map2 pair (range 1 step_count) (Array.toList flags.steps)
 
         steps =
             Array.map
@@ -68,9 +82,10 @@ init flags =
                         (String.fromInt id)
                         step.options
                 )
-                (fromList steps_with_id)
+                (Array.fromList steps_with_id)
     in
-    ( { step =
+    ( { banner_images = images
+      , step =
             case Array.get 0 steps of
                 Just i ->
                     i
@@ -79,13 +94,14 @@ init flags =
                     ready
       , steps = steps
       }
-    , Cmd.none
+    , delay banner_image.duration CycleBannerImage
     )
 
 
 type Msg
     = NoOp
     | ScrollToPane String
+    | CycleBannerImage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -96,6 +112,16 @@ update msg model =
 
         ScrollToPane target ->
             ( model, scrollIdIntoView (getManifest target model.steps).id )
+
+        CycleBannerImage ->
+            let
+                rolling_list =
+                    RollingList.roll model.banner_images
+
+                next_img =
+                    current_image rolling_list
+            in
+            ( { model | banner_images = rolling_list }, delay next_img.duration CycleBannerImage )
 
 
 ifNotFinal : Bool -> List (Html Msg) -> List (Html Msg)
@@ -108,10 +134,10 @@ ifNotFinal isFinal content =
 
 
 renderStep : Step -> Html Msg
-renderStep manifest =
+renderStep step =
     let
         { bg_color, text, text_color, from, id, options } =
-            manifest
+            step
     in
     div [ Html.Attributes.id id, style "background-color" bg_color, style "color" text_color, class ("ready stepper__container " ++ bg_color) ]
         [ div
@@ -134,7 +160,7 @@ view model =
         (List.append
             (List.append
                 [ header []
-                    [ img [ src "/giphy.webp" ] []
+                    [ img [ src ("/" ++ String.fromInt (current_image model.banner_images).id ++ ".gif") ] []
                     , h1 [] [ text "Up n' Up™" ]
                     , h4 [] [ text "let's go biking!" ]
                     ]
